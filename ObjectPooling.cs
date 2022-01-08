@@ -9,7 +9,7 @@ public class ObjectPooling : MonoBehaviour
 
     public void NextObjectInPool()
     {
-        // Gets position of wall furthest in front
+        // Gets position of object furthest in front
         Vector3 newObjectPos = ActiveObjects[2].transform.position;
 
         // Disables wall behind you
@@ -23,7 +23,7 @@ public class ObjectPooling : MonoBehaviour
         // Enables wall in front of you
         Object objToEnable = ObjectPool[0];
         // Any code necessary for enabling the object
-        objToEnable.EnableObject();
+        objToEnable.EnableObject(newObjectPos);
         // Moves object from pool to active list
         ObjectPool.Remove(objToEnable);
         ActiveObjects.Add(objToEnable);

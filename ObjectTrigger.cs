@@ -2,12 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CeilingTrigger : MonoBehaviour
+public class ObjectTrigger : MonoBehaviour
 {
     public bool isTriggerActive;
-    public WallPooling wallPooling;
-
-    public List<Enemy> Enemies = new List<Enemy>();
+    public float offset;
+    public ObjectPooling objectPooling;
 
     public void OnTriggerEnter(Collider other)
     {
@@ -15,7 +14,7 @@ public class CeilingTrigger : MonoBehaviour
         {
             if (other.CompareTag("Player"))
             {
-                wallPooling.NextWallInPool();
+                objectPooling.NextObjectInPool();
                 SetTriggerActive(false);
             }
         }
@@ -26,17 +25,11 @@ public class CeilingTrigger : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void EnableWall(Vector3 wallPos)
+    public void EnableWall(Vector3 objPos)
     {
         gameObject.SetActive(true);
-        wallPos.y += 15;
-        transform.position = wallPos;
-
-        if (Enemies.Count < 0) return;
-        for (int i = 0; i < Enemies.Count; i++)
-        {
-            Enemies[i].gameObject.SetActive(true);
-        }
+        wallPos.y += offset;
+        transform.position = objPos;
     }
 
     public void SetTriggerActive(bool isActive)

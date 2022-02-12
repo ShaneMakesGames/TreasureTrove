@@ -20,7 +20,7 @@ public class DebugDisplay : MonoBehaviour
     public void SetText(DebugInfo debugInfo)
     {
         debugText.text = debugInfo.text;
-        infoText.text = "From " + debugInfo.className + " .cs on Line " + debugInfo.lineNum;
+        infoText.text = "From " + debugInfo.className + " on Line " + debugInfo.lineNum;
     }
 
     public void OnSelected()

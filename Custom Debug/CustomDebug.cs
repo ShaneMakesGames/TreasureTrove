@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using UnityEngine.InputSystem;
 using System;
+using UnityEditor;
 
 [Serializable]
 public struct DebugInfo
@@ -43,7 +42,6 @@ public class CustomDebug : MonoBehaviour
     [Header("Canvas")]
     public GameObject canvasOBJ;
 
-
     private IEnumerator DetectInputCoroutine()
     {
         while (true)
@@ -59,6 +57,10 @@ public class CustomDebug : MonoBehaviour
             if (Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame)
             {
                 if (isOpen) MoveCursor(1);
+            }
+            if (Keyboard.current.enterKey.wasPressedThisFrame)
+            {
+                if (isOpen) OpenLogInScript(debugLogs[cursorIndex]);
             }
             yield return new WaitForEndOfFrame();
         }
@@ -100,22 +102,22 @@ public class CustomDebug : MonoBehaviour
 
         cursorIndex += amount;
 
-        if (cursorIndex > debugDisplays.Count - 1) // Off the bottom of the page
+        if (cursorIndex > debugDisplays.Count - 1)
         {
-            if (debugOffset < GetDifferenceInLogToDisplay()) // If There are more Logs than Displays, increment offset
+            if (debugOffset < GetDifferenceInLogToDisplay()) // If There are more Logs than Displays
             {
                 debugOffset++;
                 cursorIndex = debugDisplays.Count - 1;
             }
-            else // Resets Index & Offset
+            else
             {
                 cursorIndex = 0;
                 debugOffset = 0;
             }
         }
-        if (cursorIndex < 0) // Off the top of the page
+        if (cursorIndex < 0)
         {
-            if (debugOffset > 0) // Decreases offset
+            if (debugOffset > 0)
             {
                 debugOffset--;
                 cursorIndex = 0 + debugOffset;
@@ -151,5 +153,21 @@ public class CustomDebug : MonoBehaviour
 
         if (!isOpen) return;
         UpdateDisplays();
+    }
+
+    public void OpenLogInScript(DebugInfo debugInfo)
+    {
+        foreach (var assetPath in AssetDatabase.GetAllAssetPaths())
+        {
+            if (assetPath.EndsWith(debugInfo.className))
+            {
+                var script = (MonoScript)AssetDatabase.LoadAssetAtPath(assetPath, typeof(MonoScript));
+                if (script != null)
+                {
+                    AssetDatabase.OpenAsset(script, debugInfo.lineNum);
+                    break;
+                }
+            }
+        }
     }
 }

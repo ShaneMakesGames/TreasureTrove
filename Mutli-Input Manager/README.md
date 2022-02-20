@@ -1,2 +1,2 @@
-# TreasureTrove
-A collection of code to be modified &amp; reused in future projects
+# Multi-Input Manager
+Components for managing inputs from multiple gamepads. Handles connections & disconnections.

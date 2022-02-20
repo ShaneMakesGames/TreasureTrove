@@ -40,26 +40,4 @@ public class MultiInputManager : MonoBehaviour
     }
 
     #endregion
-
-    // Temporary
-    private void Update()
-    {
-        //if (Keyboard.current.spaceKey.wasPressedThisFrame) SFXSystem.singleton.PlaySFX("sfx_test");
-
-        //if (Keyboard.current.backquoteKey.isPressed) SceneSwitchManager.Instance.SwitchSceneAfterTime("PlayerSelect", 1f);
-    }
-
-    public void IncrementMinigameIndex()
-    {
-        currentMinigameIndex++;
-        if (currentMinigameIndex > Minigames.Count - 1)
-        {
-            SceneSwitchManager.Instance.SwitchSceneAfterTime("Main Menu", 3);
-        }
-        else
-        {
-            currentMinigame = Minigames[currentMinigameIndex];
-        }
-    }    
-
 }

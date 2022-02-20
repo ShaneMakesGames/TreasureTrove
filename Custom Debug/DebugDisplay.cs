@@ -8,6 +8,7 @@ public class DebugDisplay : MonoBehaviour
 {
     public TextMeshProUGUI debugText;
     public TextMeshProUGUI infoText;
+    public TextMeshProUGUI indexText;
     public Image debugImage;
     public Color defaultColor;
     public Color selectedColor;
@@ -17,10 +18,11 @@ public class DebugDisplay : MonoBehaviour
         defaultColor = debugImage.color;
     }
 
-    public void SetText(DebugInfo debugInfo)
+    public void SetText(DebugInfo debugInfo, int index)
     {
         debugText.text = debugInfo.text;
         infoText.text = "From " + debugInfo.className + " on Line " + debugInfo.lineNum;
+        indexText.text = "" + index;
     }
 
     public void OnSelected()
@@ -31,5 +33,12 @@ public class DebugDisplay : MonoBehaviour
     public void OnDeselected()
     {
         debugImage.color = defaultColor;
+    }
+
+    public void ClearDisplay()
+    {
+        debugText.text = "";
+        infoText.text = "";
+        indexText.text = "";
     }
 }

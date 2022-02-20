@@ -30,7 +30,7 @@ public class CustomDebug : MonoBehaviour
         else Destroy(this.gameObject);
     }
 
-    #endregion
+#endregion
 
     [Header("Display")]
     public bool isOpen;
@@ -41,6 +41,7 @@ public class CustomDebug : MonoBehaviour
 
     [Header("Canvas")]
     public GameObject canvasOBJ;
+    public float timeToWait;
 
     private IEnumerator DetectInputCoroutine()
     {
@@ -50,20 +51,42 @@ public class CustomDebug : MonoBehaviour
             {
                 ToggleDebugConsole();
             }
-            if (Keyboard.current.wKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame)
+            if (Keyboard.current.backspaceKey.wasPressedThisFrame || Keyboard.current.deleteKey.isPressed)
             {
-                if (isOpen) MoveCursor(-1);
-            }
-            if (Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame)
-            {
-                if (isOpen) MoveCursor(1);
+                ClearLogs();
             }
             if (Keyboard.current.enterKey.wasPressedThisFrame)
             {
-                if (isOpen) OpenLogInScript(debugLogs[cursorIndex]);
+                OpenCurrentLogInScript();
             }
-            yield return new WaitForEndOfFrame();
+
+            if (isOpen)
+            {
+                if (Keyboard.current.spaceKey.isPressed)
+                {
+#if UNITY_EDITOR
+                    TestLog();
+                    yield return new WaitForSeconds(timeToWait);
+#endif
+                }
+                if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed)
+                {
+                    MoveCursor(-1);
+                    yield return new WaitForSeconds(timeToWait);
+                }
+                if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed)
+                {
+                    MoveCursor(1);
+                    yield return new WaitForSeconds(timeToWait);
+                }
+            }
+            yield return null;
         }
+    }
+
+    private void TestLog()
+    {
+        Log("Example Debug Log", "CustomDebug.cs", 87);
     }
 
     private void ToggleDebugConsole()
@@ -91,36 +114,65 @@ public class CustomDebug : MonoBehaviour
         {
             if (i > debugDisplays.Count - 1) break;
 
-            debugDisplays[i].SetText(debugLogs[i + debugOffset]);
+            debugDisplays[i].SetText(debugLogs[i + debugOffset], i + debugOffset);
         }
         debugDisplays[cursorIndex].OnSelected();
     }
 
     public void MoveCursor(int amount)
     {
-        debugDisplays[cursorIndex].OnDeselected();
+        if (!isOpen) return;
+        if (debugLogs.Count == 0) return;
 
+        debugDisplays[cursorIndex].OnDeselected();
         cursorIndex += amount;
 
-        if (cursorIndex > debugDisplays.Count - 1)
+        if (cursorIndex > debugLogs.Count - 1 || cursorIndex > debugDisplays.Count - 1)
         {
-            if (debugOffset < GetDifferenceInLogToDisplay()) // If There are more Logs than Displays
+            MoveCursorToTop();
+        }
+        if (cursorIndex < 0)
+        {
+            MoveCursorToBottom();
+        }
+
+        UpdateDisplays();
+    }
+
+    private void MoveCursorToTop()
+    {
+        if (HasLessLogsThanDisplays())
+        {
+            cursorIndex = 0;
+            debugOffset = 0;
+        }
+        else
+        {
+            debugOffset++;
+            if (debugOffset + debugDisplays.Count - 1 > debugLogs.Count - 1)
             {
-                debugOffset++;
-                cursorIndex = debugDisplays.Count - 1;
+                debugOffset = 0;
+                cursorIndex = 0;
             }
             else
             {
-                cursorIndex = 0;
-                debugOffset = 0;
+                cursorIndex = debugDisplays.Count - 1;
             }
         }
-        if (cursorIndex < 0)
+    }
+
+    private void MoveCursorToBottom()
+    {
+        if (HasLessLogsThanDisplays())
+        {
+            cursorIndex = debugLogs.Count - 1;
+        }
+        else
         {
             if (debugOffset > 0)
             {
                 debugOffset--;
-                cursorIndex = 0 + debugOffset;
+                cursorIndex = 0;
             }
             else
             {
@@ -131,7 +183,11 @@ public class CustomDebug : MonoBehaviour
                 }
             }
         }
-        UpdateDisplays();
+    }
+
+    private bool HasLessLogsThanDisplays()
+    {
+        return debugLogs.Count < debugDisplays.Count;
     }
 
     private int GetDifferenceInLogToDisplay()
@@ -150,13 +206,17 @@ public class CustomDebug : MonoBehaviour
 #if UNITY_EDITOR
         Debug.Log(_text);
 #endif
-
         if (!isOpen) return;
         UpdateDisplays();
     }
 
-    public void OpenLogInScript(DebugInfo debugInfo)
+    public void OpenCurrentLogInScript()
     {
+#if UNITY_EDITOR
+        if (!isOpen) return;
+        if (debugLogs.Count == 0) return;
+
+        DebugInfo debugInfo = debugLogs[cursorIndex + debugOffset];
         foreach (var assetPath in AssetDatabase.GetAllAssetPaths())
         {
             if (assetPath.EndsWith(debugInfo.className))
@@ -169,5 +229,23 @@ public class CustomDebug : MonoBehaviour
                 }
             }
         }
+#endif
+    }
+
+    private void ClearLogs()
+    {
+        if (!isOpen) return;
+
+        debugDisplays[cursorIndex].OnDeselected();
+
+        for (int i = 0; i < debugDisplays.Count; i++)
+        {
+            debugDisplays[i].ClearDisplay();
+        }
+
+        debugLogs.Clear();
+        cursorIndex = 0;
+        debugOffset = 0;
+        debugDisplays[0].OnSelected();
     }
 }

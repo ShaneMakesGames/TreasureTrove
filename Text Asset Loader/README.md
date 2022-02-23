@@ -1,2 +1,2 @@
-# TreasureTrove
-A collection of code to be modified &amp; reused in future projects
+# Text Asset Loader
+A class for loading data from a text file. The text file to be loaded must be located in the Resources folder.

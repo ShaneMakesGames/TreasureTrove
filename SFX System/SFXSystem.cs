@@ -29,13 +29,6 @@ public class SFXSystem : MonoBehaviour
     public List<SFXPlayer> activeSFXPlayers;
     public List<SFXPlayer> pausedSFXPlayers;
 
-    [Header("SFX ID Lists")]
-    public List<string> UIOnHoverSFX;
-    public List<string> UIOnSubmitSFX;
-    public List<string> UIOnCancelSFX;
-    public List<string> FallingWhistleSFX;
-
-
     /// <summary>
     /// Adds all SFX in "Resources/SFX" to sfxDict
     /// </summary>
@@ -54,7 +47,7 @@ public class SFXSystem : MonoBehaviour
     /// Gets SFXPlayer from pool and plays a SFX
     /// </summary>
     /// <param name="sfxID"></param>
-    public void PlaySFX(string sfxID, bool isLoop)
+    public void PlaySFX(string sfxID, bool isLoop = false)
     {
         AudioClip sfx;
         sfxDict.TryGetValue(sfxID, out sfx);
@@ -128,4 +121,5 @@ public class SFXSystem : MonoBehaviour
             activeSFXPlayers[i].CleanUp();
         }
     }
+
 }

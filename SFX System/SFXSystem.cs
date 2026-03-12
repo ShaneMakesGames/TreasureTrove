@@ -22,10 +22,10 @@ public class SFXSystem : MonoBehaviour
     #endregion
 
     public const string path = "SFX";
-    public Dictionary<string, AudioClip> sfxDict = new Dictionary<string, AudioClip>();
+    public Dictionary<string, AudioClip> dictAllSFX = new Dictionary<string, AudioClip>();
 
     [Header("SFX Players")]
-    public List<SFXPlayer> sfxPlayerPool;
+    public List<SFXPlayer> pooledSFXPlayers;
     public List<SFXPlayer> activeSFXPlayers;
     public List<SFXPlayer> pausedSFXPlayers;
 
@@ -39,7 +39,7 @@ public class SFXSystem : MonoBehaviour
 
         for (int i = 0; i < sfxArray.Length; i++)
         {
-            sfxDict.Add(sfxArray[i].name, sfxArray[i]);
+            dictAllSFX.Add(sfxArray[i].name, sfxArray[i]);
         }
     }    
 
@@ -50,43 +50,42 @@ public class SFXSystem : MonoBehaviour
     public void PlaySFX(string sfxID, bool isLoop = false)
     {
         AudioClip sfx;
-        sfxDict.TryGetValue(sfxID, out sfx);
+        dictAllSFX.TryGetValue(sfxID, out sfx);
 
         if (sfx == null)
         {
             Debug.LogError("SFX " + sfxID + " Not Found");
             return;
         }
-        if (sfxPlayerPool.Count == 0)
+        if (pooledSFXPlayers.Count == 0)
         {
             Debug.LogError("No Available SFX Players");
             return;
         }
 
-        if (isLoop) sfxPlayerPool[0].PlaySFXOnLoop(sfx);
-        else sfxPlayerPool[0].PlaySFX(sfx);
+        if (isLoop) pooledSFXPlayers[0].PlaySFXOnLoop(sfx);
+        else pooledSFXPlayers[0].PlaySFX(sfx);
     }
 
     public void PlayRandomSFX(List<string> sfxIDs)
     {
         AudioClip sfx;
         int randIndex = Random.Range(0, sfxIDs.Count);
-        sfxDict.TryGetValue(sfxIDs[randIndex], out sfx);
+        dictAllSFX.TryGetValue(sfxIDs[randIndex], out sfx);
 
         if (sfx == null)
         {
             Debug.LogError("SFX " + sfxIDs[randIndex] + " Not Found");
             return;
         }
-        if (sfxPlayerPool.Count == 0)
+        if (pooledSFXPlayers.Count == 0)
         {
             Debug.LogError("No Available SFX Players");
             return;
         }
 
-        sfxPlayerPool[0].PlaySFX(sfx);
+        pooledSFXPlayers[0].PlaySFX(sfx);
     }
-
 
     public void PauseAllSFX()
     {
@@ -121,5 +120,4 @@ public class SFXSystem : MonoBehaviour
             activeSFXPlayers[i].CleanUp();
         }
     }
-
 }
